@@ -97,5 +97,23 @@ class UserController {
       res.status(500).json({ success: false, error: error.message });
     }
   }
+
+  async getAllCustomer(req, res) {
+    try {
+      const customers = await User.find({ role: 'customer' });
+      res.status(200).json({ success: true, customers });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }  
+
+  async getAllAdmins(req, res) {
+    try {
+      const admin = await User.find({ role: 'admin' });
+      res.status(200).json({ success: true, admin });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  } 
 }
 module.exports = new UserController();

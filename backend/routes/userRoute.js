@@ -10,6 +10,9 @@ router.get("/get/:id", authMiddleware, userController.getUserById); // Protected
 router.put("/update/:id", authMiddleware, userController.updateUser); // Protected route
 router.delete("/delete/:id", authMiddleware, userController.deleteUser); // Protected route
 
+router.get("/get-customers", authMiddleware, userController.getAllCustomer); // Protected route
+router.get("/get-admins", authMiddleware, userController.getAllAdmins); // Protected route
+
 // Route for User login
 router.post("/login", userController.loginUser);
 
