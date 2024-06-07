@@ -2,6 +2,8 @@ const { User } = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = process.env.JWT_SECRET || '24112000@Kk'; // Make sure to use a secure secret in production
+
 class UserController {
 
   async addUser(req, res) {
@@ -88,7 +90,7 @@ class UserController {
       }
 
       const payload = { userId: user._id, role: user.role };
-      const token = jwt.sign(payload, 'your_jwt_secret', { expiresIn: '1h' });
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
       res.status(200).json({ success: true, userId: user._id, role: user.role, token });
     } catch (error) {
@@ -96,5 +98,4 @@ class UserController {
     }
   }
 }
-
 module.exports = new UserController();
