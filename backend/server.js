@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 
 
 const userRoutes = require('./routes/userRoute');
+const adminRoute = require('./routes/adminRoute');
 
 dotenv.config();
 const app = express();
@@ -32,6 +33,7 @@ mongoose.connection.once('open', () => {
 });
 
 app.use('/user', userRoutes);
+app.use('/admin', adminRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
