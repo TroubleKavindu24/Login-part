@@ -8,6 +8,7 @@ router.post("/login", adminController.adminLogin);
 router.get("/get",authMiddleware,adminController.getAllAdmins);
 router.get("/get/:id", authMiddleware,adminController.getAdminById);
 router.put("/update/:id", authMiddleware, adminController.updateAdminProfile); // Protected route
+router.delete("/delete/:id", authMiddleware,adminController.deleteAdminProfileById);
 
 
 module.exports = router;

@@ -68,6 +68,7 @@ class AdminController {
   }
 
   async updateAdminProfile(req, res) {
+
     const { id } = req.params;
     const updates = req.body;
     const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is passed as "Bearer <token>"
@@ -96,6 +97,36 @@ class AdminController {
       res.status(500).json({ success: false, error: error.message });
     }
   }
+
+  async deleteAdminProfileById(req, res) {
+    const { id } = req.params;
+    const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is passed as "Bearer <token>"
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET); // Verify the token using your secret key
+
+      if (decoded.adminId !== id) { // Check if the ID in the token matches the ID in the request
+        return res.status(403).json({ success: false, message: 'You are not authorized to delete this profile' });
+      }
+
+      const deletedAdmin = await Admin.findByIdAndDelete(id);
+      if (!deletedAdmin) {
+        return res.status(404).json({ success: false, message: 'Admin not found' });
+      }
+
+      res.status(200).json({ success: true, message: 'Admin profile deleted successfully' });
+    } catch (error) {
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ success: false, message: 'Invalid token' });
+      }
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+  
 }
 
 module.exports = new AdminController();

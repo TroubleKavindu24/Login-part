@@ -2,9 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
 
 
 const userRoutes = require('./routes/userRoute');
@@ -32,7 +29,7 @@ mongoose.connection.once('open', () => {
   console.log('Database Synced');
 });
 
-app.use('/user', userRoutes);
+app.use('/users', userRoutes);
 app.use('/admin', adminRoute);
 
 app.listen(PORT, () => {

@@ -2,15 +2,15 @@ const { User } = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || '24112000@Kk'; // Make sure to use a secure secret in production
+const JWT_SECRET = process.env.JWT_SECRET || '24112000@Kk'; 
 
 class UserController {
 
   async addUser(req, res) {
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ firstName, lastName, email, password: hashedPassword, role });
+    const user = new User({ firstName, lastName, email, password: hashedPassword });
 
     try {
       await user.save();
@@ -31,18 +31,18 @@ class UserController {
 
   async getUserById(req, res) {
     const { id } = req.params;
-
+  
     try {
       const user = await User.findById(id);
       if (!user) {
-        res.status(404).json({ success: false, message: 'User not found' });
-        return;
+        return res.status(404).json({ success: false, message: 'User not found' });
       }
       res.status(200).json({ success: true, user });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   }
+  
 
   async updateUser(req, res) {
     const { id } = req.params;
@@ -75,45 +75,42 @@ class UserController {
     }
   }
 
-  async loginUser(req, res) {
-    const { email, password } = req.body;
+  
 
-    try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
-      }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid password' });
-      }
+async loginUser(req, res) {
+  const { email, password } = req.body;
 
-      const payload = { userId: user._id, role: user.role };
-      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-
-      res.status(200).json({ success: true, userId: user._id, role: user.role, token });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+  // Basic validation
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Please provide email and password' });
   }
 
-  async getAllCustomer(req, res) {
-    try {
-      const customers = await User.find({ role: 'customer' });
-      res.status(200).json({ success: true, customers });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Invalid credentials' });
     }
-  }  
 
-  async getAllAdmins(req, res) {
-    try {
-      const admin = await User.find({ role: 'admin' });
-      res.status(200).json({ success: true, admin });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+    // Check if the password matches
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-  } 
+
+    // Create JWT payload
+    const payload = { userId: user._id };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(200).json({ success: true, userId: user._id, token });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+}
+
+
+
+
 }
 module.exports = new UserController();

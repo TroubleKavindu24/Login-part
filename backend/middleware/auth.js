@@ -1,19 +1,17 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || '24112000@Kk'; // Make sure to use a secure secret in production
-
 const authMiddleware = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.header('Authorization').replace('Bearer ', '');
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
+    return res.status(401).json({ success: false, message: 'No token provided' });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.id; // Assuming the payload contains the user ID as 'id'
     next();
-  } catch (ex) {
-    res.status(400).json({ success: false, message: 'Invalid token.' });
+  } catch (err) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
   }
 };
 
