@@ -8,10 +8,10 @@ class UserController {
 
   async addUser(req, res) {
     const { firstName, lastName, email, password } = req.body;
-
+  
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ firstName, lastName, email, password: hashedPassword });
-
+  
     try {
       await user.save();
       res.status(201).json({ success: true, user });
@@ -81,13 +81,11 @@ class UserController {
 async loginUser(req, res) {
   const { email, password } = req.body;
 
-  // Basic validation
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Please provide email and password' });
   }
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ success: false, message: 'Invalid credentials' });
